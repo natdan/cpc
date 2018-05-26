@@ -1,0 +1,17 @@
+d:assets:0:application/unknown
+i:cursor.png:244:image/png
+i:creative-sphere.png:177591:image/png
+i:cursor-empty.png:2828:image/png
+i:pointer.png:3740:image/png
+t:arial-32.fnt:15332:application/unknown
+t:din-alternate-bold-32.fnt:15891:application/unknown
+i:din-alternate-bold-32.png:14494:image/png
+i:arial-32.png:16993:image/png
+t:com/badlogic/gdx/graphics/g3d/particles/particles.fragment.glsl:820:application/unknown
+t:com/badlogic/gdx/graphics/g3d/particles/particles.vertex.glsl:2886:application/unknown
+t:com/badlogic/gdx/graphics/g3d/shaders/default.fragment.glsl:5162:application/unknown
+t:com/badlogic/gdx/graphics/g3d/shaders/default.vertex.glsl:8824:application/unknown
+t:com/badlogic/gdx/graphics/g3d/shaders/depth.fragment.glsl:869:application/unknown
+t:com/badlogic/gdx/graphics/g3d/shaders/depth.vertex.glsl:2923:application/unknown
+t:com/badlogic/gdx/utils/arial-15.fnt:21743:application/unknown
+i:com/badlogic/gdx/utils/arial-15.png:21814:image/png
