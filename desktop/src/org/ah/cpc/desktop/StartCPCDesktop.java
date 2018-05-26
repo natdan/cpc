@@ -6,7 +6,7 @@ import org.ah.cpc.DefaultPlatformSpecific;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
-public class StartCPCDesktopFrontend {
+public class StartCPCDesktop {
     public static void main(final String[] args) {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 

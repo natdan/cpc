@@ -6,7 +6,7 @@ import org.ah.cpc.PlatformSpecific;
 import com.badlogic.gdx.backends.jogamp.JoglNewtApplication;
 import com.badlogic.gdx.backends.jogamp.JoglNewtApplicationConfiguration;
 
-public class StartCPCDesktopFrontendJOGL {
+public class StartCPCDesktopJOGL {
 
     static boolean initialised = false;
 
