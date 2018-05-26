@@ -45,8 +45,8 @@ public class StartCPCDesktopJOGL {
         System.out.println("--------------------------------------------------------------");
 
         JoglNewtApplicationConfiguration config = new JoglNewtApplicationConfiguration();
-        config.width = 1280;
-        config.height = 800;
+        config.width = 1920;
+        config.height = 1080;
         config.x = 0;
         config.y = 0;
 
