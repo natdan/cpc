@@ -245,8 +245,13 @@ public class FontObjLoader extends ObjLoader {
             final short[] finalIndices = new short[numIndices];
             // if there are too many vertices in a mesh, we can't use indices
             if (numIndices > 0) {
-                for (int i = 0; i < numIndices; i++) {
-                    finalIndices[i] = (short)(i);
+//                for (int i = 0; i < numIndices; i++) {
+//                    finalIndices[i] = (short)(i);
+//                }
+                for (int i = 0; i < numIndices / 3; i++) {
+                    finalIndices[i * 3] = (short)(i * 3);
+                    finalIndices[i * 3 + 1] = (short)(i * 3 + 2);
+                    finalIndices[i * 3 + 2] = (short)(i * 3 + 1);
                 }
             }
 

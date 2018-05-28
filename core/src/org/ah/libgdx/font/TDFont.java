@@ -23,7 +23,9 @@ public class TDFont {
 
         ShaderProgram getShader();
 
-        void begin(Camera cam, Matrix4 model);
+        void begin(Camera cam);
+
+        void render(FontStillModel model);
 
         Matrix4 calculate(T internal, int spacing, int kern);
 
@@ -47,14 +49,19 @@ public class TDFont {
         }
 
         @Override
+        public void render(FontStillModel model) {
+            getModelBatch().render(model);
+        }
+
+        @Override
         public void end() {
             modelBatch.end();
             if (shader != null) { shader.getShaderProgram().end(); }
         }
 
         @Override
-        public void begin(Camera cam, Matrix4 model) {
-            if (shader != null) { shader.begin(cam, model); }
+        public void begin(Camera cam) {
+            if (shader != null) { shader.begin(cam); }
             modelBatch.begin(cam);
         }
 
@@ -65,7 +72,7 @@ public class TDFont {
 
     }
 
-    public static abstract class LinearXYCallback extends AbstractCallback<Matrix4> {
+    public static class LinearXYCallback extends AbstractCallback<Matrix4> {
 
         protected Matrix4 temp = new Matrix4();
         protected float scale;
@@ -247,7 +254,9 @@ public class TDFont {
     }
 
 
-    public <T> T drawTextLine(Callback<T> callback, T initialSet, Camera cam, String s) {
+    public <T> T drawTextLine(Callback<T> callback, T initialSet, Camera camera, String s) {
+
+        callback.begin(camera);
 
         boolean first = true;
 
@@ -276,17 +285,16 @@ public class TDFont {
                 Matrix4 modelTransform = callback.calculate(initialSet, spacing, kern);
 
                 if (c > ' ' && letters[c - 32] != null) {
-                    callback.begin(cam, modelTransform);
                     FontStillModel fontStillModel = letters[c - 32];
                     fontStillModel.transform = modelTransform;
-                    callback.getModelBatch().render(fontStillModel);
-                    callback.end();
+                    callback.render(fontStillModel);
                 }
             } else {
                 callback.calculate(initialSet, lastSpacing / 2, -1);
             }
             lastSpacing = thisSpacing;
         }
+        callback.end();
 
         callback.calculate(initialSet, lastSpacing / 2, -1);
 

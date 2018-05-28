@@ -3,7 +3,6 @@ package org.ah.libgdx.shaders;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 
@@ -29,19 +28,19 @@ public abstract class AbstractShader {
     public void dispose() {
         shaderProgram.dispose();
     }
-    
+
     public ShaderProgram getShaderProgram() {
         return shaderProgram;
     }
-    
-    public void begin(Camera camera, Matrix4 model) {
+
+    public void begin(Camera camera) {
         begin();
     }
 
     public void begin() {
         shaderProgram.begin();
     }
-    
+
     public void end() {
         shaderProgram.end();
     }

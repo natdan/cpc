@@ -7,6 +7,9 @@ import static org.ah.cpc.CPCConstants.FONT_32_FNT;
 import static org.ah.cpc.PlatformSpecific.CONFIG_IS_DESKTOP;
 import static org.ah.cpc.PlatformSpecific.CONFIG_MOUSE_SHOW;
 
+import java.util.Random;
+
+import org.ah.libgdx.font.FontStillModel;
 import org.ah.libgdx.font.TDFont;
 import org.ah.libgdx.font.TDFont.LinearXYCallback;
 
@@ -16,7 +19,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.BitmapFontLoader.BitmapFontParameter;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
@@ -85,9 +87,10 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
     private Matrix4 textPosition = new Matrix4();
     private LinearXYCallback linearCallback;
     private InputMultiplexer cameraInputMultiplexer;
-    private CameraInputController camController;
+    private CameraInputController cameraController;
     private Environment environment;
 
+    private Random random = new Random(1);
 
     public CPCounter(PlatformSpecific platformSpecific) {
         this.platformSpecific = platformSpecific;
@@ -113,7 +116,7 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
         orthographicCamera.setToOrtho(true, 1280, 800);
 
         perspectiveCamera = new PerspectiveCamera(45, 1280, 800);
-        perspectiveCamera.position.set(0f, 2f, 10f);
+        perspectiveCamera.position.set(5f, 3f, 7f);
         perspectiveCamera.up.set(new Vector3(0, 1, 0));
         perspectiveCamera.lookAt(0f, 0f, 0f);
 
@@ -121,11 +124,11 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
         perspectiveCamera.far = 1000f;
         perspectiveCamera.update();
 
-        camController = new CameraInputController(perspectiveCamera);
-        camController.target.set(new Vector3(0, 0, 0));
+        cameraController = new CameraInputController(perspectiveCamera);
+        cameraController.target.set(new Vector3(0, 0, 0));
         cameraInputMultiplexer = new InputMultiplexer();
         cameraInputMultiplexer.addProcessor(this);
-        cameraInputMultiplexer.addProcessor(camController);
+        cameraInputMultiplexer.addProcessor(cameraController);
         Gdx.input.setInputProcessor(cameraInputMultiplexer);
         // Gdx.input.setInputProcessor(this);
 
@@ -182,9 +185,26 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
         tdFont.loadFont("arial-3d.font");
 
         linearCallback = new TDFont.LinearXYCallback(null, 0.015f) {
-            @Override public void begin(Camera cam, Matrix4 model) {
-                super.begin(cam, model);
+            @Override public void render(FontStillModel model) {
+                getModelBatch().render(model, environment);
             }
+
+            @Override public Matrix4 calculate(Matrix4 position, int spacing, int kern) {
+                Matrix4 result = super.calculate(position, spacing, kern);
+                result.translate(random.nextFloat() * 0.01f, random.nextFloat() * 0.01f, random.nextFloat() * 0.01f);
+
+                if (elapsedTime % 60 < 11) {
+                    float t = elapsedTime % 60;
+                    t = 5f - Math.abs(t - 5f);
+                    t = 1f + t / 50f;
+
+                    result.scale(t, t, t);
+                }
+                result.scale(1f, 1f, 4f);
+
+                return result;
+            }
+
         };
 
         smallFont = assetManager.get(FONT_32_FNT);
@@ -240,7 +260,7 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
                 spriteBatch.end();
             }
         } else {
-            camController.update();
+            cameraController.update();
             elapsedTime++;
 
             Gdx.gl20.glClearColor(0, 0, 0, 1);
@@ -275,7 +295,7 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
                 String fpsString = Gdx.graphics.getFramesPerSecond() + "fps";
                 float fpsWidth = new GlyphLayout(smallFont, fpsString).width;
 
-                smallFont.draw(spriteBatch, fpsString, width - fpsWidth - 2, 2);
+                smallFont.draw(spriteBatch, fpsString, width / 2 - fpsWidth, 2);
 
                 if (pointer != null) {
                     pointer.draw(spriteBatch);
