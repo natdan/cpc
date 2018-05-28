@@ -33,8 +33,10 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.Renderable;
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
@@ -91,6 +93,8 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
     private Environment environment;
 
     private Random random = new Random(1);
+    private Material transparentBlueMaterial;
+    private DirectionalLight directionalLight;
 
     public CPCounter(PlatformSpecific platformSpecific) {
         this.platformSpecific = platformSpecific;
@@ -146,7 +150,13 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
 
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-        environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+        directionalLight = new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f);
+        environment.add(directionalLight);
+
+        transparentBlueMaterial = new Material(
+                ColorAttribute.createDiffuse(0.0f, 0.0f, 0.8f, 0.8f),
+                new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+                );
 
         assetManager.load(CREATIVE_SPHERE_PNG, Texture.class);
         assetManager.load(CURSOR_PNG, Pixmap.class);
@@ -186,6 +196,10 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
 
         linearCallback = new TDFont.LinearXYCallback(null, 0.015f) {
             @Override public void render(FontStillModel model) {
+                Material material = model.materials.get(0);
+
+                material.set(transparentBlueMaterial);
+
                 getModelBatch().render(model, environment);
             }
 
@@ -271,6 +285,11 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
             Gdx.gl20.glEnable(GL20.GL_POLYGON_OFFSET_FILL);
             Gdx.gl20.glPolygonOffset(1.0f, 1.0f);
 
+            Gdx.gl20.glEnable(GL20.GL_BLEND);
+            Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            Gdx.gl20.glBlendEquation(GL20.GL_BLEND);
+
+
             try {
 //                spriteBatch.begin();
 //                creativeSphereSprite.draw(spriteBatch);
@@ -290,6 +309,7 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
 
                 textPosition.idt().translate(-5f, 0f, 0f);
                 tdFont.drawTextLine(linearCallback, textPosition, perspectiveCamera, "Hello World");
+                directionalLight.setDirection((float)Math.sin(elapsedTime / 50f), -0.8f, (float)Math.cos(elapsedTime / 50f));
 
                 spriteBatch.begin();
                 String fpsString = Gdx.graphics.getFramesPerSecond() + "fps";
