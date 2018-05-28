@@ -219,15 +219,25 @@ public class FontObjLoader extends ObjLoader {
             final int numElements = faces.size;
             final int numFaces = group.numFaces;
             final boolean hasNorms = group.hasNorms;
-            final boolean hasUVs = group.hasUVs;
+            boolean hasUVs = group.hasUVs;
+            boolean hasUVsf = true;
 
-            final float[] finalVerts = new float[(numFaces * 3) * (3 + (hasNorms ? 3 : 0) + (hasUVs ? 2 : 0))];
+            int vertexSize = (3 + 4 + (hasNorms ? 3 : 0) + (hasUVsf ? 2 : 0));
+            final float[] finalVerts = new float[(numFaces * 3) * vertexSize];
 
             for (int i = 0, vi = 0; i < numElements;) {
                 int vertIndex = faces.get(i++) * 3;
-                finalVerts[vi++] = verts.get(vertIndex++);
-                finalVerts[vi++] = verts.get(vertIndex++);
-                finalVerts[vi++] = verts.get(vertIndex);
+                float x = verts.get(vertIndex++);
+                float y = verts.get(vertIndex++);
+                float z = verts.get(vertIndex++);
+
+                finalVerts[vi++] = x;
+                finalVerts[vi++] = y;
+                finalVerts[vi++] = z;
+                finalVerts[vi++] = 1.0f;
+                finalVerts[vi++] = 1.0f;
+                finalVerts[vi++] = 1.0f;
+                finalVerts[vi++] = 1.0f;
                 if (hasNorms) {
                     int normIndex = faces.get(i++) * 3;
                     finalVerts[vi++] = norms.get(normIndex++);
@@ -238,27 +248,63 @@ public class FontObjLoader extends ObjLoader {
                     int uvIndex = faces.get(i++) * 2;
                     finalVerts[vi++] = uvs.get(uvIndex++);
                     finalVerts[vi++] = uvs.get(uvIndex);
+                } else {
+                    if (z <= -0.1f + 0.001f) {
+//                        finalVerts[vi++] = (x + 1f) / 2f;
+//                        finalVerts[vi++] = (y + 1f) / 2f;
+                        finalVerts[vi++] = 0;
+                        finalVerts[vi++] = 0;
+                    } else if (z >= 0.1f - 0.01f) {
+                        finalVerts[vi++] = (x + 1f) / 2f;
+                        finalVerts[vi++] = (y + 1f) / 2f;
+                    } else {
+                        finalVerts[vi++] = 0;
+                        finalVerts[vi++] = 0;
+                    }
                 }
             }
 
-            final int numIndices = numFaces * 3 >= Short.MAX_VALUE ? 0 : numFaces * 3;
-            final short[] finalIndices = new short[numIndices];
+            int numIndices = numFaces * 3 >= Short.MAX_VALUE ? 0 : numFaces * 3;
+            short[] finalIndices = new short[numIndices];
             // if there are too many vertices in a mesh, we can't use indices
             if (numIndices > 0) {
 //                for (int i = 0; i < numIndices; i++) {
 //                    finalIndices[i] = (short)(i);
 //                }
+                int realTotal = 0;
                 for (int i = 0; i < numIndices / 3; i++) {
-                    finalIndices[i * 3] = (short)(i * 3);
-                    finalIndices[i * 3 + 1] = (short)(i * 3 + 2);
-                    finalIndices[i * 3 + 2] = (short)(i * 3 + 1);
+//                    finalIndices[i * 3] = (short)(i * 3);
+//                    finalIndices[i * 3 + 1] = (short)(i * 3 + 2);
+//                    finalIndices[i * 3 + 2] = (short)(i * 3 + 1);
+
+                    int vertexIndex1 = (i * 3 + 0) * vertexSize + 2;
+                    int vertexIndex2 = (i * 3 + 1) * vertexSize + 2;
+                    int vertexIndex3 = (i * 3 + 2) * vertexSize + 2;
+                    float vz1 = finalVerts[vertexIndex1];
+                    float vz2 = finalVerts[vertexIndex2];
+                    float vz3 = finalVerts[vertexIndex3];
+
+//                    if (vz1 <= -0.1f + 0.0001f && vz2 <= -0.1f + 0.0001f && vz3 <= -0.1f + 0.0001f) {
+                    if (vz1 >= 0.1f - 0.01f && vz2 >= 0.1f - 0.01f && vz3 >= 0.1f - 0.01f) {
+                        finalIndices[realTotal] = (short)(i * 3);
+                        finalIndices[realTotal + 1] = (short)(i * 3 + 2);
+                        finalIndices[realTotal + 2] = (short)(i * 3 + 1);
+                        realTotal = realTotal + 3;
+                    }
                 }
+                short[] newFinal = new short[realTotal];
+                for (int i = 0; i < realTotal; i++) {
+                    newFinal[i] = finalIndices[i];
+                }
+                finalIndices = newFinal;
+                numIndices = realTotal;
             }
 
             Array<VertexAttribute> attributes = new Array<VertexAttribute>();
             attributes.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
+            attributes.add(VertexAttribute.ColorUnpacked());
             if (hasNorms) attributes.add(new VertexAttribute(Usage.Normal, 3, ShaderProgram.NORMAL_ATTRIBUTE));
-            if (hasUVs) attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"));
+            if (hasUVsf) attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"));
 
             String stringId = Integer.toString(++id);
             String nodeId = "default".equals(group.name) ? "node" + stringId : group.name;

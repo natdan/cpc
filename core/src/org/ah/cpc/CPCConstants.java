@@ -8,6 +8,7 @@ public final class CPCConstants {
     public static final String CURSOR_PNG = "cursor.png";
     public static final String CURSOR_EMPTY_PNG = "cursor-empty.png";
     public static final String POINTER_PNG = "pointer.png";
+    public static final String FUR_JPG = "fur.jpg";
 
     private CPCConstants() { }
 
