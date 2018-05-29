@@ -51,7 +51,7 @@ import com.badlogic.gdx.math.Vector3;
 
 public class CPCounter extends ApplicationAdapter implements InputProcessor {
 
-    private static final int LAYERS = 30;
+    private static final int LAYERS = 10;
 
     public static final float CLICK_FEEDBACK_TIMEOUT = 1250f;
     // private LibGDXLogger logger = new LibGDXLogger("Frontend");
@@ -378,7 +378,7 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
 
                 furShader.program.setUniformf("u_displacement", displacement.x, displacement.y, 0.0f);
                 furShader.program.setUniformf("u_time", furTime);
-                furShader.program.setUniformf("u_hair_length", -0.04f);
+                furShader.program.setUniformf("u_hair_length", -0.01f);
 
 //                for (int i = 0; i < LAYERS; i++) {
 //                    furShader.program.setUniformf("u_layer", (float)i / (float)LAYERS);
@@ -395,11 +395,14 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
                 directionalLight.setDirection((float)Math.sin(elapsedTime / 50f), -0.8f, (float)Math.cos(elapsedTime / 50f));
 
                 spriteBatch.begin();
+                String descString = "RPi3, " + Gdx.graphics.getWidth() + "x" + Gdx.graphics.getHeight() + "    ";
+                float descWidth = new GlyphLayout(smallFont, descString).width;
                 String fpsString = Gdx.graphics.getFramesPerSecond() + "fps";
                 float fpsWidth = new GlyphLayout(smallFont, fpsString).width;
 
 //                smallFont.draw(spriteBatch, fpsString, width - fpsWidth, 2);
-                smallFont.draw(spriteBatch, fpsString, 100 - fpsWidth, 2);
+                smallFont.draw(spriteBatch, descString, 0, 2);
+                smallFont.draw(spriteBatch, fpsString, descWidth - fpsWidth, 2);
 
                 if (pointer != null) {
                     pointer.draw(spriteBatch);
