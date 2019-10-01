@@ -214,7 +214,7 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
 
                     result.scale(t, t, t);
                 }
-                result.scale(1f, 1f, 4f);
+                result.scale(1f, 1f, 1000f);
 
                 return result;
             }
@@ -308,7 +308,7 @@ public class CPCounter extends ApplicationAdapter implements InputProcessor {
 //                modelBatch.end();
 
                 textPosition.idt().translate(-5f, 0f, 0f);
-                tdFont.drawTextLine(linearCallback, textPosition, perspectiveCamera, "Hello World");
+                tdFont.drawTextLine(linearCallback, textPosition, perspectiveCamera, Long.toString(time));
                 directionalLight.setDirection((float)Math.sin(elapsedTime / 50f), -0.8f, (float)Math.cos(elapsedTime / 50f));
 
                 spriteBatch.begin();
